@@ -1,0 +1,46 @@
+from datetime import datetime
+from typing import List, Optional
+
+from bson import ObjectId
+from pydantic import BaseModel, Field, HttpUrl
+
+
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError("Invalid objectid")
+        return ObjectId(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type="string")
+
+
+class ArticleData(BaseModel):
+    title: str
+    content_body: str
+    image_urls: List[HttpUrl]
+    published_at: datetime
+    author: Optional[str] = None
+    views: Optional[int] = None
+    comments: List[str] = []
+    likes: Optional[int] = None
+    dislikes: Optional[int] = None
+    video_url: Optional[HttpUrl] = None
+
+
+class NewsItem(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    url: HttpUrl
+    article_data: ArticleData
+    source: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}

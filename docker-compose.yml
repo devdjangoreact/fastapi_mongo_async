@@ -1,0 +1,28 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGODB_URL=mongodb://mongo:27017
+      - API_KEYS=test-key-1,test-key-2
+      - PYTHONPATH=/app/src
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+      - ./libs:/app/libs # Mount libs directory for development
+    env_file:
+      - .env
+
+  mongo:
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=hotline_parser
+
+volumes:
+  mongo_data:
