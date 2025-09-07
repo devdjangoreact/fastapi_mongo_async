@@ -1,0 +1,60 @@
+{
+    "products": [
+        {
+            "_id": "507f1f77bcf86cd799439011",
+            "url": "https://example.com/product/smartphone-x-pro",
+            "offers": [
+                {
+                    "url": "https://shop1.com/offer/smartphone-x-pro",
+                    "original_url": "https://manufacturer.com/smartphone-x-pro",
+                    "title": "Smartphone X Pro 256GB Black",
+                    "shop": "ElectroShop",
+                    "price": 15999.99,
+                    "is_used": false
+                },
+                {
+                    "url": "https://shop2.com/deal/smartphone-x-pro",
+                    "original_url": "https://manufacturer.com/smartphone-x-pro",
+                    "title": "Smartphone X Pro 256GB Black (Refurbished)",
+                    "shop": "TechMarket",
+                    "price": 12999.50,
+                    "is_used": true
+                },
+                {
+                    "url": "https://shop3.com/product/smartphone-x-pro-256gb",
+                    "original_url": "https://manufacturer.com/smartphone-x-pro",
+                    "title": "Smartphone X Pro 256GB - Official Store",
+                    "shop": "OfficialStore",
+                    "price": 16250.00,
+                    "is_used": false
+                }
+            ],
+            "created_at": "2024-01-15T10:00:00",
+            "updated_at": "2024-01-15T14:30:00"
+        },
+        {
+            "_id": "607f1f77bcf86cd799439012",
+            "url": "https://example.com/product/laptop-ultra-2024",
+            "offers": [
+                {
+                    "url": "https://computershop.com/laptop-ultra-2024",
+                    "original_url": "https://brand.com/laptop-ultra-2024",
+                    "title": "Laptop Ultra 2024 16\" i7 16GB 1TB SSD",
+                    "shop": "ComputerWorld",
+                    "price": 28999.00,
+                    "is_used": false
+                },
+                {
+                    "url": "https://techoutlet.com/laptop-ultra-demo",
+                    "original_url": "https://brand.com/laptop-ultra-2024",
+                    "title": "Laptop Ultra 2024 Demo Unit",
+                    "shop": "TechOutlet",
+                    "price": 24999.00,
+                    "is_used": true
+                }
+            ],
+            "created_at": "2024-01-14T15:45:00",
+            "updated_at": "2024-01-15T09:15:00"
+        }
+    ]
+}

@@ -1,21 +1,36 @@
 # routers/news.py
-from datetime import datetime
-from typing import Optional
+from datetime import date, datetime
+from typing import List
+from urllib.parse import urlparse
 
 from fastapi import APIRouter, HTTPException, Query
 
-from ..core.database import get_database
 from ..core.logger import log
-from ..schemas.news import NewsResponse
+from ..repositories.news_repository import news_repository
+from ..schemas.news import ArticleDataSchema, ClientType, NewsItemSchema, NewsResponse
+from ..services.news_parser import news_parser_factory
 
 router = APIRouter()
 
+# List of supported domains
+SUPPORTED_DOMAINS = ["epravda.com.ua", "politeka.net", "pravda.com.ua"]
 
-@router.post("", response_model=NewsResponse)
+
+@router.post(
+    "",
+    response_model=NewsResponse,
+    responses={
+        400: {"description": "Unsupported news source"},
+        404: {"description": "News not found"},
+        500: {"description": "Internal server error"},
+    },
+)
 async def get_news(
     url: str = Query(..., description="News source URL"),
-    until_date: datetime = Query(..., description="Limit date for news"),
-    client: Optional[str] = Query(None, description="Client identifier"),
+    until_date: date = Query(
+        ..., description="Limit date for news", example="2024-01-15"
+    ),
+    client: ClientType = Query(None, description="Client identifier"),
 ):
     """
     Get news from specified source
@@ -26,20 +41,56 @@ async def get_news(
     - client: Client identifier (optional)
     """
     try:
-        db = get_database()
 
-        news_data = await db.news.find_one(
-            {"source_url": url, "date": {"$lte": until_date}}
+        domain = urlparse(url).netloc.lower()
+        is_supported = any(
+            supported_domain in domain for supported_domain in SUPPORTED_DOMAINS
         )
 
-        if not news_data:
-            log.warning(f"No news found for source: {url}")
-            raise HTTPException(status_code=404, detail="News not found")
+        if not is_supported:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unsupported news source. Supported domains: {', '.join(SUPPORTED_DOMAINS)}",
+            )
+        # Convert date to datetime for database query
+        until_datetime = datetime.combine(until_date, datetime.min.time())
 
-        news_response = NewsResponse(**news_data)
+        # First try to get data from database
+        db_news = await news_repository.get_news_by_source_and_date(
+            url=url, until_date=until_datetime
+        )
 
-        log.success(f"News retrieved successfully: {url}")
-        return news_response
+        if db_news:
+            log.success(f"Found {len(db_news)} news items in database for {url}")
+            # Convert database models to response schema
+            news_items = [
+                NewsItemSchema(
+                    url=item.url,
+                    article_data=ArticleDataSchema(**item.article_data.model_dump()),
+                    source=item.source,
+                    created_at=item.created_at,
+                )
+                for item in db_news
+            ]
+            return NewsResponse(items=news_items, source=url, from_cache=True)
+
+        # If no data in database, use parser
+        log.info(f"No data in database for {url}, starting parser...")
+        parser = news_parser_factory.get_parser(url)
+
+        try:
+            news_items = await parser.parse_news(url, until_datetime, client)
+
+            # Save parsed news to database
+            if news_items:
+                source_domain = urlparse(url).netloc
+                await news_repository.save_news_items(news_items, source_domain)
+                log.success(f"Parsed and saved {len(news_items)} news items from {url}")
+
+            return NewsResponse(items=news_items, source=url, from_cache=False)
+
+        finally:
+            await parser.close()
 
     except HTTPException:
         raise

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from bson import ObjectId
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.json_schema import GenerateJsonSchema
 from pydantic_core import core_schema
 
@@ -36,19 +36,19 @@ class PyObjectId(ObjectId):
 class ArticleData(BaseModel):
     title: str
     content_body: str
-    image_urls: List[HttpUrl]
+    image_urls: List[str]
     published_at: datetime
     author: Optional[str] = None
     views: Optional[int] = None
     comments: List[str] = []
     likes: Optional[int] = None
     dislikes: Optional[int] = None
-    video_url: Optional[HttpUrl] = None
+    video_url: Optional[str] = None
 
 
 class NewsItem(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    url: HttpUrl
+    url: str
     article_data: ArticleData
     source: str
     created_at: datetime = Field(default_factory=datetime.utcnow)

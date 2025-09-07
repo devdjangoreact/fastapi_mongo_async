@@ -1,0 +1,103 @@
+{
+    "pravda": [
+        {
+            "url": "https://www.pravda.com.ua/news/2024/01/15/123456789/",
+            "article_data": {
+                "title": "Важливі зміни в економічній політиці країни",
+                "content_body": "Уряд запровадив нові економічні стимули для підтримки малого бізнесу. Ці заходи спрямовані на стабілізацію ринку та залучення інвестицій.",
+                "image_urls": [
+                    "https://www.pravda.com.ua/images/news/2024/01/15/123456789_1.jpg",
+                    "https://www.pravda.com.ua/images/news/2024/01/15/123456789_2.jpg"
+                ],
+                "published_at": "2024-01-15T10:30:00",
+                "author": "Іван Петренко",
+                "views": 15420,
+                "comments": [
+                    "Чудова новина!",
+                    "Нарешті позитивні зміни!",
+                    "Сподіваюсь, це допоможе бізнесу"
+                ],
+                "likes": 245,
+                "dislikes": 12,
+                "video_url": "https://www.pravda.com.ua/videos/2024/01/15/123456789.mp4"
+            },
+            "source": "pravda.com.ua",
+            "created_at": "2024-01-15T11:00:00"
+        },
+        {
+            "url": "https://www.pravda.com.ua/news/2024/01/14/123456788/",
+            "article_data": {
+                "title": "Зустріч глав держав: нові угоди про співпрацю",
+                "content_body": "Підписано низку важливих міжнародних угод, які сприятимуть економічному розвитку та безпеці регіону.",
+                "image_urls": [
+                    "https://www.pravda.com.ua/images/news/2024/01/14/123456788_1.jpg"
+                ],
+                "published_at": "2024-01-14T18:45:00",
+                "author": "Олена Сидоренко",
+                "views": 8920,
+                "comments": [
+                    "Важливий крок вперед",
+                    "Сподіваюсь на позитивні результати"
+                ],
+                "likes": 178,
+                "dislikes": 8,
+                "video_url": null
+            },
+            "source": "pravda.com.ua",
+            "created_at": "2024-01-14T19:00:00"
+        }
+    ],
+    "politeka": [
+        {
+            "url": "https://politeka.net/news/1234567/",
+            "article_data": {
+                "title": "Нові тенденції в культурному житті столиці",
+                "content_body": "Столиця готується до масштабного культурного фестивалю, який об'єднає митців з різних куточків країни.",
+                "image_urls": [
+                    "https://politeka.net/images/news/1234567/main.jpg",
+                    "https://politeka.net/images/news/1234567/gallery1.jpg",
+                    "https://politeka.net/images/news/1234567/gallery2.jpg"
+                ],
+                "published_at": "2024-01-15T14:20:00",
+                "author": "Марія Коваль",
+                "views": 23450,
+                "comments": [
+                    "Чекаю з нетерпінням!",
+                    "Чудова ініціатива",
+                    "Обов'язково відвідаю"
+                ],
+                "likes": 345,
+                "dislikes": 15,
+                "video_url": "https://politeka.net/videos/1234567.mp4"
+            },
+            "source": "politeka.net",
+            "created_at": "2024-01-15T14:30:00"
+        }
+    ],
+    "epravda": [
+        {
+            "url": "https://www.epravda.com.ua/news/2024/01/15/123456/",
+            "article_data": {
+                "title": "Інновації в енергетичному секторі",
+                "content_body": "Компанії представляють нові технології для відновлюваної енергетики, що дозволить зменшити залежність від традиційних джерел.",
+                "image_urls": [
+                    "https://www.epravda.com.ua/images/news/2024/01/15/123456_1.jpg",
+                    "https://www.epravda.com.ua/images/news/2024/01/15/123456_2.jpg"
+                ],
+                "published_at": "2024-01-15T09:15:00",
+                "author": "Андрій Іваненко",
+                "views": 12340,
+                "comments": [
+                    "Перспективний напрямок",
+                    "Важливо для майбутнього",
+                    "Цікаві технології"
+                ],
+                "likes": 198,
+                "dislikes": 5,
+                "video_url": null
+            },
+            "source": "epravda.com.ua",
+            "created_at": "2024-01-15T09:30:00"
+        }
+    ]
+}

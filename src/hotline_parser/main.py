@@ -73,7 +73,7 @@ async def setup_scheduler_and_routers():
         news.router,
         prefix="/news",
         tags=["news"],
-        dependencies=[Depends(get_api_key)],
+        # dependencies=[Depends(get_api_key)],
     )
     app.include_router(
         admin.router,

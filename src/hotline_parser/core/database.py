@@ -26,7 +26,7 @@ async def close_db():
     from ..services.scheduler import scheduler_service
 
     if db.client:
-        await scheduler_service.stop_scheduler()
+        # await scheduler_service.stop_scheduler()
         db.client.close()
         log.info("Database connection closed")
 
