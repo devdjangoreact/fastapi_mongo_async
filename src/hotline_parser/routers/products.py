@@ -1,12 +1,12 @@
-from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
-from ..core.database import get_database
 from ..core.exceptions import ParsingException, TimeoutException
 from ..core.logger import log
+from ..repositories.product_repository import product_repository
 from ..schemas.product import ProductResponse
+from ..services.product_parser import product_parser
 
 router = APIRouter()
 
@@ -19,29 +19,40 @@ async def get_product_offers(
     price_sort: Optional[str] = Query(None, pattern="^(asc|desc)$"),
 ):
     try:
-        db = get_database()
-
         # Get product from database
-        product_data = await db.products.find_one({"url": url})
+        product_data = await product_repository.get_product_by_url(url=url)
+
+        if product_data:
+
+            # Convert to response model
+            product = ProductResponse(**product_data.model_dump())
+
+            # Apply sorting if requested
+            if price_sort:
+                reverse = price_sort.lower() == "desc"
+                product.offers.sort(key=lambda x: x.price, reverse=reverse)
+
+            # Apply count limit if requested
+            if count_limit:
+                product.offers = product.offers[:count_limit]
+
+            log.success(f"Product data retrieved from database: {url}")
+            return product
+
+        # If not found in database, use parser with mock data
+        log.info(f"Product not found in database, using parser: {url}")
+        product_data = await product_parser.parse_product(
+            url=url,
+            timeout_limit=timeout_limit,
+            count_limit=count_limit,
+            price_sort=price_sort,
+        )
 
         if not product_data:
-            log.warning(f"Product not found in database: {url}")
+            log.warning(f"Product not found {url}")
             raise HTTPException(status_code=404, detail="Product not found")
 
-        # Convert to response model
-        product = ProductResponse(**product_data)
-
-        # Apply sorting if requested
-        if price_sort:
-            reverse = price_sort.lower() == "desc"
-            product.offers.sort(key=lambda x: x.price, reverse=reverse)
-
-        # Apply count limit if requested
-        if count_limit:
-            product.offers = product.offers[:count_limit]
-
-        log.success(f"Product data retrieved from database: {url}")
-        return product
+        return product_data
 
     except HTTPException:
         raise

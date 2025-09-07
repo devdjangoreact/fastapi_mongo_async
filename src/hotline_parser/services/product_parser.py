@@ -1,12 +1,15 @@
 import asyncio
+import json
+import os
+from datetime import datetime
 from typing import List, Optional
-from urllib.parse import urlparse
 
 import httpx
 from bs4 import BeautifulSoup
 
 from ..core.exceptions import ParsingException, TimeoutException
 from ..core.logger import log
+from ..repositories.product_repository import product_repository
 from ..schemas.product import OfferSchema, ProductResponse
 from .browser_client import browser_client
 
@@ -14,6 +17,53 @@ from .browser_client import browser_client
 class HotlineProductParser:
     def __init__(self):
         self.client = httpx.AsyncClient(timeout=30)
+        self.mock_data = self._load_mock_data()
+
+    def _load_mock_data(self) -> dict:
+        """Load mock data from JSON file"""
+        try:
+            mock_file = os.path.join("mock_data", "product_mock_data.json")
+            with open(mock_file, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            return {}
+        except Exception as e:
+            print(f"Error loading mock data: {e}")
+            return {}
+
+    def _create_product_objects_from_json(
+        self, json_data: List[dict]
+    ) -> List[ProductResponse]:
+        """Create ProductResponse objects from JSON data"""
+        products = []
+
+        for product_data in json_data.get("products", []):
+            try:
+                # Convert string dates to datetime objects
+                product_data["created_at"] = datetime.fromisoformat(
+                    product_data["created_at"].replace("Z", "+00:00")
+                )
+                product_data["updated_at"] = datetime.fromisoformat(
+                    product_data["updated_at"].replace("Z", "+00:00")
+                )
+
+                # Create schema objects
+                offers = [
+                    OfferSchema(**offer) for offer in product_data.get("offers", [])
+                ]
+
+                product = ProductResponse(
+                    url=product_data["url"],
+                    offers=offers,
+                    created_at=product_data["created_at"],
+                    updated_at=product_data["updated_at"],
+                )
+                products.append(product)
+            except Exception as e:
+                print(f"Error creating product object: {e}")
+                continue
+
+        return products
 
     async def parse_product(
         self,
@@ -25,7 +75,22 @@ class HotlineProductParser:
         try:
             log.info(f"Starting product parsing: {url}")
 
-            # Use browser client for JavaScript rendering
+            # Check if we have mock data for this URL
+            mock_products = self._create_product_objects_from_json(self.mock_data)
+            for product in mock_products:
+                # Create a simple product object with only required fields
+                simple_product = ProductResponse(
+                    url=str(product.url), offers=product.offers
+                )
+                # Save each mock product to database using repository
+                await product_repository.save_or_update_product(simple_product)
+
+            for product in mock_products:
+                if product.url == url:
+                    log.info(f"Using mock data for product: {url}")
+                    return product
+
+            # If no mock data, use browser client for real parsing
             content = await browser_client.get_page_content(
                 url, timeout=timeout_limit or 30
             )

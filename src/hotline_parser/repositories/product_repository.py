@@ -68,7 +68,13 @@ class ProductRepository:
         existing_product = await self.get_product_by_url(str(product_data.url))
 
         if existing_product:
-            await self.update_product(str(product_data.url), product_data)
+            update_dict = {
+                "$set": {
+                    "offers": [offer.dict() for offer in product_data.offers],
+                    "updated_at": datetime.utcnow(),
+                }
+            }
+            await self.update_product({"url": str(product_data.url)}, update_dict)
             return str(existing_product.id)
         else:
             return await self.create_product(product_data)
