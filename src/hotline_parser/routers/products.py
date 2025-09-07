@@ -1,15 +1,17 @@
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
+from ..core.database import get_database
 from ..core.exceptions import ParsingException, TimeoutException
-from ..schemas.product import ProductQueryParams, ProductResponse
-from ..services.product_parser import product_parser
+from ..core.logger import log
+from ..schemas.product import ProductResponse
 
 router = APIRouter()
 
 
-@router.get("/offers", response_model=ProductResponse)
+@router.post("", response_model=ProductResponse)
 async def get_product_offers(
     url: str = Query(..., description="Product page URL"),
     timeout_limit: Optional[int] = Query(None, ge=1, le=30),
@@ -17,16 +19,32 @@ async def get_product_offers(
     price_sort: Optional[str] = Query(None, pattern="^(asc|desc)$"),
 ):
     try:
-        result = await product_parser.parse_product(
-            url=url,
-            timeout_limit=timeout_limit,
-            count_limit=count_limit,
-            price_sort=price_sort,
-        )
-        return result
-    except TimeoutException as e:
-        raise HTTPException(status_code=408, detail=str(e))
-    except ParsingException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        db = get_database()
+
+        # Get product from database
+        product_data = await db.products.find_one({"url": url})
+
+        if not product_data:
+            log.warning(f"Product not found in database: {url}")
+            raise HTTPException(status_code=404, detail="Product not found")
+
+        # Convert to response model
+        product = ProductResponse(**product_data)
+
+        # Apply sorting if requested
+        if price_sort:
+            reverse = price_sort.lower() == "desc"
+            product.offers.sort(key=lambda x: x.price, reverse=reverse)
+
+        # Apply count limit if requested
+        if count_limit:
+            product.offers = product.offers[:count_limit]
+
+        log.success(f"Product data retrieved from database: {url}")
+        return product
+
+    except HTTPException:
+        raise
     except Exception as e:
+        log.error(f"Failed to retrieve product {url}: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")

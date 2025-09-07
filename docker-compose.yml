@@ -11,9 +11,9 @@ services:
       - mongo
     volumes:
       - .:/app
-      - ./libs:/app/libs # Mount libs directory for development
     env_file:
       - .env
+    restart: unless-stopped
 
   mongo:
     image: mongo:7.0
@@ -23,6 +23,20 @@ services:
       - mongo_data:/data/db
     environment:
       - MONGO_INITDB_DATABASE=hotline_parser
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=password
+    depends_on:
+      - mongo
+    restart: unless-stopped
 
 volumes:
   mongo_data:

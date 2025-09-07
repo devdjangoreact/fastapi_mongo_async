@@ -8,29 +8,28 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     libssl-dev \
     curl \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN pip install poetry
+RUN pip install --no-cache-dir poetry
 
 # Copy poetry files
 COPY pyproject.toml poetry.lock* ./
 
-# Configure Poetry to install dependencies to ./libs
-RUN poetry config virtualenvs.create true \
-    && poetry config virtualenvs.in-project true \
-    && poetry config virtualenvs.path "/app/libs/.venv"
+# Configure Poetry to NOT use virtualenvs in Docker
+RUN poetry config virtualenvs.create false
 
-# Install dependencies
-RUN poetry install --no-dev --no-interaction --no-ansi
+# Install dependencies using poetry (globally, no virtualenv)
+RUN poetry install --without dev --no-interaction --no-ansi --no-root
 
-# Install Playwright browsers
-RUN poetry run playwright install chromium \
-    && poetry run playwright install-deps chromium
+# # Install Playwright system dependencies and browser
+# RUN playwright install --with-deps chromium
 
 # Copy source code
 COPY src/ ./src/
-COPY tests/ ./tests/
+
+# Copy .env if it exists
 COPY .env ./
 
 # Create non-root user
@@ -41,5 +40,5 @@ USER user
 
 EXPOSE 8000
 
-# Use Poetry's virtual environment
-CMD ["poetry", "run", "uvicorn", "src.hotline_parser.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Directly use uvicorn (installed globally)
+CMD ["uvicorn", "src.hotline_parser.main:app", "--host", "0.0.0.0", "--port", "8000"]

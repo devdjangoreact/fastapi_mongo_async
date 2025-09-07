@@ -17,7 +17,6 @@ Async service for parsing products from Hotline.ua and news from various sources
 hotline-parser/
 ├── src/ # Source code
 ├── tests/ # Test files
-├── libs/ # Virtual environment and dependencies (auto-created)
 ├── Dockerfile
 ├── docker-compose.yml
 ├── pyproject.toml
@@ -54,7 +53,7 @@ Install Poetry:
 
 bash
 pip install poetry
-Install dependencies to libs folder:
+Install dependencies 
 
 bash
 make install
@@ -72,7 +71,7 @@ bash
 make run
 Available Make Commands
 bash
-make install # Install dependencies to libs/
+make install # Install dependencies 
 make run # Run locally
 make test # Run tests
 make lint # Run linters
@@ -114,7 +113,7 @@ Run tests: make test
 Format code: make format
 
 Docker Development
-For development with Docker, the libs directory is mounted as a volume, so you can develop locally and run in Docker with the same dependencies.
+For development with Docker, the  directory is mounted as a volume, so you can develop locally and run in Docker with the same dependencies.
 
 License
 MIT
@@ -143,7 +142,7 @@ make run
 bash
 make docker-up
 Команди для роботи:
-make install - встановлює залежності в папку libs/
+make install - встановлює залежності в папку 
 
 make run - запускає додаток локально
 
@@ -155,5 +154,5 @@ make lint - перевіряє код
 
 make format - форматує код
 
-Ця структура дозволяє мати всі залежності в папці libs/ у корні проекту, що спрощує розробку як локально, так і в Docker.
+Ця структура дозволяє мати всі залежності в папці у корні проекту, що спрощує розробку як локально, так і в Docker.
 ```

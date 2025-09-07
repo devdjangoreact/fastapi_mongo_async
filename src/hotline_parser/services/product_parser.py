@@ -6,6 +6,7 @@ import httpx
 from bs4 import BeautifulSoup
 
 from ..core.exceptions import ParsingException, TimeoutException
+from ..core.logger import log
 from ..schemas.product import OfferSchema, ProductResponse
 from .browser_client import browser_client
 
@@ -22,6 +23,8 @@ class HotlineProductParser:
         price_sort: Optional[str] = None,
     ) -> ProductResponse:
         try:
+            log.info(f"Starting product parsing: {url}")
+
             # Use browser client for JavaScript rendering
             content = await browser_client.get_page_content(
                 url, timeout=timeout_limit or 30
@@ -39,11 +42,15 @@ class HotlineProductParser:
             if count_limit:
                 offers = offers[:count_limit]
 
-            return ProductResponse(url=url, offers=offers)
+            result = ProductResponse(url=url, offers=offers)
+            log.success(f"Product parsed successfully: {url}, offers: {len(offers)}")
+            return result
 
         except asyncio.TimeoutError:
+            log.error(f"Product parsing timeout: {url}")
             raise TimeoutException("Product parsing timeout")
         except Exception as e:
+            log.error(f"Failed to parse product {url}: {str(e)}")
             raise ParsingException(f"Failed to parse product: {str(e)}")
 
     async def _parse_offers(
@@ -53,6 +60,8 @@ class HotlineProductParser:
 
         # Parse offers from Hotline product page
         offer_elements = soup.select(".offer__item") or soup.select('[class*="offer"]')
+
+        log.debug(f"Found {len(offer_elements)} offer elements")
 
         for offer in offer_elements[:20]:  # Limit to first 20 offers
             try:
@@ -88,11 +97,12 @@ class HotlineProductParser:
                         title=f"Offer from {shop}",
                         shop=shop,
                         price=price,
-                        is_used=False,  # You might need to parse this from the page
+                        is_used=False,
                     )
                 )
 
-            except Exception:
+            except Exception as e:
+                log.warning(f"Failed to parse offer: {str(e)}")
                 continue
 
         return offers
@@ -102,12 +112,12 @@ class HotlineProductParser:
             async with self.client:
                 response = await self.client.get(offer_url, follow_redirects=True)
                 return str(response.url)
-        except Exception:
+        except Exception as e:
+            log.warning(f"Failed to get original URL for {offer_url}: {str(e)}")
             return None
 
     async def close(self):
         await self.client.aclose()
 
 
-product_parser = HotlineProductParser()
 product_parser = HotlineProductParser()

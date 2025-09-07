@@ -1,13 +1,12 @@
 import asyncio
 from datetime import datetime
 from typing import List, Optional
+from urllib.parse import urlparse
 
 import httpx
-from bs4 import BeautifulSoup
 
 from ..core.exceptions import ParsingException, TimeoutException
 from ..schemas.news import ArticleDataSchema, NewsItemSchema
-from .browser_client import browser_client
 
 
 class BaseNewsParser:
