@@ -1,4 +1,4 @@
-from datetime import datetime
+from enum import Enum
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -23,3 +23,10 @@ class ProductQueryParams(BaseModel):
     timeout_limit: Optional[int] = Field(None, ge=1, le=30)
     count_limit: Optional[int] = Field(None, ge=1, le=100)
     price_sort: Optional[str] = Field(None, pattern="^(asc|desc)$")
+
+
+class SortType(str, Enum):
+    """Available client types for news parsing"""
+
+    ASC = "asc"
+    DESC = "desc"

@@ -3,8 +3,8 @@ import asyncio
 import pytest
 from fastapi.testclient import TestClient
 
-from src.hotline_parser.core.database import close_db, init_db
-from src.hotline_parser.main import app
+from src.core.database import close_db, init_db
+from src.main import app
 
 
 @pytest.fixture(scope="session")

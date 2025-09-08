@@ -1,6 +1,4 @@
-# routers/news.py
 from datetime import date, datetime
-from typing import List
 from urllib.parse import urlparse
 
 from fastapi import APIRouter, HTTPException, Query

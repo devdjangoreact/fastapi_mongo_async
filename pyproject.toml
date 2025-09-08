@@ -35,7 +35,7 @@ mypy = "^1.7.1"
 pre-commit = "^3.5.0"
 
 [tool.poetry.scripts]
-start = "hotline_parser.main:main"
+start = "main:main"
 
 [build-system]
 requires = ["poetry-core"]

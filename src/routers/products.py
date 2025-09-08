@@ -2,10 +2,9 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
-from ..core.exceptions import ParsingException, TimeoutException
 from ..core.logger import log
 from ..repositories.product_repository import product_repository
-from ..schemas.product import ProductResponse
+from ..schemas.product import ProductResponse, SortType
 from ..services.product_parser import product_parser
 
 router = APIRouter()
@@ -16,7 +15,7 @@ async def get_product_offers(
     url: str = Query(..., description="Product page URL"),
     timeout_limit: Optional[int] = Query(None, ge=1, le=30),
     count_limit: Optional[int] = Query(None, ge=1, le=100),
-    price_sort: Optional[str] = Query(None, pattern="^(asc|desc)$"),
+    price_sort: SortType = Query(None, pattern="^(asc|desc)$"),
 ):
     try:
         # Get product from database

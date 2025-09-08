@@ -5,7 +5,7 @@ install:
 	poetry install
 
 run:
-	poetry run uvicorn src.hotline_parser.main:app --reload --host 0.0.0.0 --port 8000
+	poetry run uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 	docker compose up -d mongo mongo-express
 	
 test:
