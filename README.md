@@ -19,7 +19,6 @@ Clone the repository:
 
 ```bash
 git clone <repository-url>
-cd hotline-parser
 ```
 
 Create environment file:
@@ -36,7 +35,7 @@ bash
 make docker-up
 ```
 API will be available at: http://localhost:8000
-
+testing bettar with http://127.0.0.1:8000/docs#
 
 ## Local Development
 
